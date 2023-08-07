@@ -1,13 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        AZURE_SUBSCRIPTION_ID = credentials('AZURE_SUBSCRIPTION_ID')
-        AZURE_CLIENT_ID       = credentials('AZURE_CLIENT_ID')
-        AZURE_CLIENT_SECRET   = credentials('AZURE_CLIENT_SECRET')
-        AZURE_TENANT_ID       = credentials('AZURE_TENANT_ID')
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -23,13 +16,27 @@ pipeline {
 
         stage("plan") {
             steps {
-                sh "terraform plan -var 'AZURE_SUBSCRIPTION_ID=${env.AZURE_SUBSCRIPTION_ID}' -var 'AZURE_CLIENT_ID=${env.AZURE_CLIENT_ID}' -var 'AZURE_CLIENT_SECRET=${env.AZURE_CLIENT_SECRET}' -var 'AZURE_TENANT_ID=${env.AZURE_TENANT_ID}'"
+                withCredentials([
+                    string(credentialsId: 'AZURE_SUBSCRIPTION_ID', variable: 'AZURE_SUBSCRIPTION_ID'),
+                    string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
+                    string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
+                    string(credentialsId: 'AZURE_TENANT_ID', variable: 'AZURE_TENANT_ID')
+                ]) {
+                    sh "terraform plan -var 'AZURE_SUBSCRIPTION_ID=${env.AZURE_SUBSCRIPTION_ID}' -var 'AZURE_CLIENT_ID=${env.AZURE_CLIENT_ID}' -var 'AZURE_CLIENT_SECRET=${env.AZURE_CLIENT_SECRET}' -var 'AZURE_TENANT_ID=${env.AZURE_TENANT_ID}'"
+                }
             }
         }
 
         stage("Action") {
             steps {
-                sh "terraform ${action} --auto-approve -var 'AZURE_SUBSCRIPTION_ID=${env.AZURE_SUBSCRIPTION_ID}' -var 'AZURE_CLIENT_ID=${env.AZURE_CLIENT_ID}' -var 'AZURE_CLIENT_SECRET=${env.AZURE_CLIENT_SECRET}' -var 'AZURE_TENANT_ID=${env.AZURE_TENANT_ID}'"
+                withCredentials([
+                    string(credentialsId: 'AZURE_SUBSCRIPTION_ID', variable: 'AZURE_SUBSCRIPTION_ID'),
+                    string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
+                    string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
+                    string(credentialsId: 'AZURE_TENANT_ID', variable: 'AZURE_TENANT_ID')
+                ]) {
+                    sh "terraform ${action} --auto-approve -var 'AZURE_SUBSCRIPTION_ID=${env.AZURE_SUBSCRIPTION_ID}' -var 'AZURE_CLIENT_ID=${env.AZURE_CLIENT_ID}' -var 'AZURE_CLIENT_SECRET=${env.AZURE_CLIENT_SECRET}' -var 'AZURE_TENANT_ID=${env.AZURE_TENANT_ID}'"
+                }
             }
         }
 
