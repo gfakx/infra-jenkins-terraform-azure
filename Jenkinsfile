@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/gfakx/terraforn-infra-jenkins.git'
+                git branch: 'main', url: 'https://github.com/gfakx/infra-jenkins-terraform-azure.git'
             }
         }
 
