@@ -53,7 +53,7 @@ pipeline {
         ]) {
             sh "az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID"
             sh "az aks get-credentials --name gfakxaks --resource-group gfakxrg"
-            sh "kubectl apply -f deployment.yml"
+            sh '/usr/local/bin/kubectl apply -f deployment.yml'
                 }
             }
         }
